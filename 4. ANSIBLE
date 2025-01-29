@@ -47,7 +47,7 @@ systemctl status sshd
 
 ANSIBLE SERVER:
 amazon-linux-extras install ansible2 -y
-yum install python python-pip python-dlevel -y
+yum install python3 python3-pip python3-devel -y
 vim /etc/ansible/hosts (12)
 
 [dev]
