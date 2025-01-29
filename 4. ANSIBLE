@@ -140,6 +140,7 @@ ansible all -m service -a "name=httpd state=stopped"
 ansible all -m user -a "name=rajinikanth state=present"
 ansible all -m user -a "name=rajinikanth state=absent"
 ansible all -m copy -a "src=app.yml dest=/root"
+ansible all -m file -a "path=/root/app.yml state=absent"
 ansible all -a "ls /root"
 
 PLAYBOOKS:
