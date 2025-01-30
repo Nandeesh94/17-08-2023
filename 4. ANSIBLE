@@ -365,19 +365,23 @@ ansible all -a "yum remove git* maven* docker* tree* -y"
   tasks:
     - name: install git*
       yum: name={{a}} state=present
+      tags: ["11"]
 
     - name: install maven
       yum: name={{b}} state=present
+      tags: ["12"]
 
     - name: install docker
       yum: name={{c}} state=present
+      tags: ["13"]
 
     - name: install {{d}}
       yum: name={{d}} state=present
+      tags: ["14"]
 
     - name: install {{e}}
       yum: name={{e}} state=present
-
+      tags: ["15"]
 
  single var: ansible-playbook raham.yml --extra-vars "d=tree"
  multi var: ansible-playbook raham.yml --extra-vars "d=tree e=java-1.8.0-openjdk"
