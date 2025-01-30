@@ -314,6 +314,7 @@ DYNAMIC VARS: vars which are not define inside playbook.
     - name: install docker
       yum: name={{c}} state=present
 
+:%s/present/absent/g     #inside of the file
 
 ansible-playbook raham.yml
 
