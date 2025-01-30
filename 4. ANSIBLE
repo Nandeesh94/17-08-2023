@@ -176,6 +176,7 @@ vim raham.yml
 
 ansible-playbook raham.yml
 
+sed -i 's/present/absent/g' raham.yml
 
 - hosts: all
   tasks:
