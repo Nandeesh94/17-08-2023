@@ -356,7 +356,7 @@ ansible-playbook raham.yml
 
 ansible all -a "yum remove git* maven* docker* tree* -y"
 
-=====================
+==================================================================================================================
 
 - hosts: all
   vars:
@@ -389,6 +389,45 @@ ansible all -a "yum remove git* maven* docker* tree* -y"
 
 sed -i "s/present/absent/g" raham.yml
  multi var: ansible-playbook raham.yml --extra-vars "d=tree e=java-1.8.0-openjdk"
+==========================================================================================================================================
+
+- hosts: all
+  vars:
+    a: git
+    b: maven
+    c: docker
+    d: started
+  tasks:
+    - name: install pkgs
+      yum: name={{a}} state=absent
+      tags: ["11"]
+
+    - name: install pkgs
+      yum: name={{b}} state=absent
+      tags: ["12"]
+
+    - name: install pkgs
+      yum: name={{c}} state=absent
+      tags: ["13"]
+
+    - name: install pkgs
+      yum: name{{d}} state=absent
+      tags: ["14"]
+
+    - name: install pkgs
+      yum: name={{e}} state=absent
+      tags: ["15"]
+
+    - name: install pkgs
+      yum:  name={{f}} state=absent
+      tags: ["16"]
+
+ansible-playbook nandeesh.yml --skip-tags "11,12,13,14" --extra-vars "e=treee f=java-1.8.0-openjdk"
+
+
+
+===============================================================================================================================
+
 
 LOOPS:
 
