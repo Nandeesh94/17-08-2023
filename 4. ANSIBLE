@@ -594,8 +594,10 @@ python: pip
 
     - name: installing Pandas
       pip: name=Pandas state=present
-
-
+========================================================================
+1.  ansible all -m yum -a "name=python3-pip state=present" 
+2.  ansible all -m pip -a "name=pandas state=present" 
+========================================================================
 ANSIBLE SETUP MODULES: Used to print the complete info of worker nodes.
 
 ROLES: 
