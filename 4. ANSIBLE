@@ -818,7 +818,6 @@ P : PHP
       yum: name=python3 state=present
 
 =============================================================================
-
 NETFLIX DEPLOPYMET:
 
 - hosts: test
@@ -836,10 +835,18 @@ NETFLIX DEPLOPYMET:
       git:
         repo: "https://github.com/CleverProgrammers/pwj-netflix-clone.git"
         dest: "/var/www/html"
-
+=======================================================================================================
 TOMCAT SETUP:
 USE TOMCAT.YML, CONTEXT.XML AND TOMCAT-USER.XML FROM BELOW REPO
 https://github.com/RAHAMSHAIK007/all-setups.git
+
+ps aux | grep tomcat                     #verify tomcat is running or not
+tail -f /root/tomcat2/logs/catalina.out  #Check logs if needed
+
+
+
+
+==========================================================================================================
 
 CONDITIONS:
 CLUSTER: GROUP OF NODES/SERVERS
