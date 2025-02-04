@@ -584,6 +584,9 @@ with services we can distribute the containers to all servers.
 
 docker service create --name movies --replicas=3 --publish 81:80 jayaprakashsairam05/movies:latest
 
+docker history nandeesh901/dth   : This will show each layer’s size, creation time, and corresponding command from the Dockerfile.
+docker run --rm -it nandeesh901/dth /bin/bash :This will open a shell inside the container, allowing you to navigate and see what files are present.
+
 docker service ls		: to list services
 docker service ps train		: to list containers for train
 docker service inspect train	: to get complete info of train service
