@@ -143,6 +143,7 @@ kubectl describe rs swiggy-rs
 kubectl delete rs swiggy-rs
 kubectl edit rs/swiggy-rs
 
+kubectl delete pod -l app=swiggy
 
 
 SCALING: 
