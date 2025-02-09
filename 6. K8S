@@ -193,6 +193,8 @@ kubectl edit deploy/swiggy-rs
 kubectl delete deploy swiggy-r
 kubectl delete po --all
 
+kubectl rollout restart deployment zomoto-rs
+
 
 KUBECOLOR:
 
