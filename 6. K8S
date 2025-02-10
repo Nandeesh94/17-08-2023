@@ -578,6 +578,9 @@ kubectl config view --minify | grep namespace : to see current namespace
 kubectl delete ns dev	: to delete namespace
 kubectl delete pod --all: to delete all pods
 
+kubectl describe deployment <deployment-name> -n <namespace-name>
+kubectl describe deployment zomoto-rs -n dev
+
 
 NOTE: By deleting  the ns all objects also gets deleted.
 in real time we use rbac concept to restrict the access from one namespace to another.
