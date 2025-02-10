@@ -482,11 +482,14 @@ kops update cluster --name rahams.k8s.local --yes --admin
 
 
 Suggestions:
- * list clusters with: kops get cluster
- * edit this cluster with: kops edit cluster rahams.k8s.local
- * edit your node instance group: kops edit ig --name=rahams.k8s.local nodes-us-east-1a
+ * list clusters with             : kops get cluster
+ * edit this cluster with         : kops edit cluster rahams.k8s.local
+ * edit your node instance group  : kops edit ig --name=rahams.k8s.local nodes-us-east-1a
+     after edit ig give this cmd  : kops update cluster --name nandu.k8s.local --yes --admin
+                                  : kops rolling-update cluster --yes
  * edit your master instance group: kops edit ig --name=rahams.k8s.local master-us-east-1a
-
+     after edit ig give this cmd  : kops update cluster --name nandu.k8s.local --yes --admin
+                                  : kops rolling-update cluster --yes
 
 ADMIN ACTIVITIES:
 To scale the worker nodes:
