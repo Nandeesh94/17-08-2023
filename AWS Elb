@@ -1,0 +1,11 @@
+[root@ip-172-31-82-91 html]# history
+    1  yum install httpd -y && systemctl start httpd && systemctl status httpd
+    2  cd /var/www/html/
+    3  vim index.html
+    4  vim index.html
+    5  tail -100f /var/log/httpd/acess_log
+    6  tail -100f /var/log/httpd/access_log
+    7  htop
+    8  yum install htop -y
+    9  htop
+   10  history
