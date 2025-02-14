@@ -41,6 +41,36 @@ amazon-linux-extras install epel -y
 yum install strees -y
 
 
+If you need dashboards for other metrics, you can import them using Grafana.
+
+| **Dashboard Name**                   | **ID**    |
+|---------------------------------------|----------|
+| Node Exporter Full                   | 1860     |
+| Linux Host Overview                  | 11074    |
+| Kubernetes Cluster Monitoring         | 6417     |
+| Docker Monitoring                     | 193      |
+| Windows Server Monitoring             | 2129     |
+| Windows Node Monitoring (WMI)         | 10441    |
+| cAdvisor Dashboard for Docker         | 13659    |
+| PostgreSQL Performance                | 9628     |
+| MySQL Server Metrics                  | 7362     |
+| Redis Dashboard                       | 763      |
+| MongoDB Monitoring                    | 7165     |
+| Nginx Monitoring                      | 10944    |
+| Apache Server Dashboard               | 3894     |
+| HAProxy Monitoring                    | 10585    |
+| AWS EC2 Monitoring                    | 9385     |
+| Azure Monitor Insights                | 14601    |
+| Network Traffic Overview              | 2949     |
+| SNMP Network Monitoring               | 9276     |
+| Elasticsearch Cluster Monitoring      | 4358     |
+| RabbitMQ Overview                     | 10991    |
+| Ceph Cluster Monitoring               | 7231     |
+| Zabbix Server Dashboard               | 6095     |
+| Jenkins Performance Monitoring        | 11002    |
+
+To import, go to **Grafana → Dashboards → Import** and enter the ID.
+
 
 LOKI INTEGRATION:
 Grafana with integration of Loki and Promtail:
