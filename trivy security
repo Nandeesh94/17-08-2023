@@ -5,6 +5,27 @@ vim .bashrc
 export PATH=$PATH:/usr/local/bin/
 source .bashrc 
 
+=====================================================================================================================
+trivy new version.
+curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh
+sudo mv ./bin/trivy /usr/local/bin/
+vim .bashrc
+export PATH=$PATH:/usr/local/bin/
+source .bashrc
+trivy --version
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
