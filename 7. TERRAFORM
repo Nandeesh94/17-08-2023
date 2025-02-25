@@ -268,6 +268,9 @@ variable "instance_type" {
 terraform apply --auto-approve -var="instance_type=t2.medium"
 terraform destroy --auto-approve -var="instance_type=t2.medium"
 
+
+terraform apply --auto-approve -var="instance_count=3" -var="instance_type=t2.large"
+
 TERRAFORM OUTPUTS: used to print the resource properties.
 ex: public-ip, dns, instance type
 
