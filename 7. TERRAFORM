@@ -289,8 +289,31 @@ Name = "raham-server"
 output "raham" {
 value = [aws_instance.one.public_ip, aws_instance.one.private_ip, aws_instance.one.public_dns, aws_instance.one.private_dns]
 }
+=========================================================================================================
 
+provider "aws" {
+  region = "us-east-1"
+}
 
+resource "aws_instance" "one" {
+  count         = var.instance_count
+  ami           = "ami-04681163a08179f28"
+  instance_type = var.instance_type
+  tags = {
+    Name = "nandeesh_server"
+  }
+  root_block_device {
+    encrypted = true
+  }
+  metadata_options {
+    http_tokens = "required"
+  }
+}
+
+output "nandeesh" {
+value = aws_instance.one[0].public_ip
+}
+=================================================================================
 TERRAFORM IMPORT: used to import and track the resources which is created manually.
 
 
