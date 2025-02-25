@@ -88,6 +88,8 @@ terraform apply --auto-approve
 
 terraform destroy --auto-approve -target="aws_instance.one[0]" -target="aws_instance.one[1]"
 
+trivy config --severity HIGH,CRITICAL main.tf
+
 STATE FILE: used to store the resource information which is created by terraform
 to track the resource activities
 in real time entire resource info is on state file.
