@@ -429,6 +429,8 @@ then we can use taint concetp
 terraform taint aws_instance.four
 terraform apply --auto-approve
 
+terraform apply --auto-approve -replace=aws_ebs_volume.two -replace=aws_iam_user.three
+
 Terraform Lifecycle:
 
 Prevent_destroy: used to keep secure our resources without destroying.
