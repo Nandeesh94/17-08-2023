@@ -1,0 +1,131 @@
+48 th session devops software installation all servers.
+
+*web server
+*app server
+*db server
+
+web server :
+
+apt install update -y
+apt install upgrade -y
+
+apt install apache2 -y
+cd /var/www/html/
+git clone https://github.com/CleverProgrammers/pwj-netflix-clone.git
+mv pwj-netflix-clone/* .
+paste the public ip in new tab (to show the netflix application) and
+uninstall apache2
+sudo apt purge apache2* -y
+            or
+sudo apt remove --purge apache2 apache2-utils apache2-bin apache2.2-common -y
+sudo apt autoremove -y
+
+install nginx
+apt install nginx -y
+cd /var/www/html/
+git clone https://github.com/CleverProgrammers/pwj-netflix-clone.git
+mv pwj-netflix-clone/* .
+paste the public ip in new tab (to show the netflix application) and
+uninstall nginx
+sudo apt purge nginx* -y
+          or
+sudo apt remove --purge nginx nginx-common -y
+sudo apt autoremove -y
+          
+
+
+App server:
+
+if my project java application?
+
+apt install update -y
+apt install upgrade -y
+apt-get install default-jre -y
+apt-get install default-jdk -y
+java -version
+apt install vim -y
+vim /etc/profile.d/jdk11.sh
+         export JAVA_HOME="/usr/lib/jvm/java-11.0.10"
+         export PATH="$PATH:${JAVA_HOME}/bin"
+echo $JAVA_HOME
+echo $PATH
+reboot   # reboot the server & restart
+
+RUN BASIC JAVA PROGRAMME
+ 
+vim HelloWorld.java
+
+/* HelloWorld.java
+ */
+
+public class HelloWorld
+{
+        public static void main(String[] args) {
+                System.out.println("Hello World!");
+        }
+}
+
+cmd: javac HelloWorld  :to compile the progremme
+cmd: java HelloWorld   : to execute the progremme
+
+
+
+
+         PYTHON  INSTALLATION ON UBUNTU
+if my project python application?
+
+CMDS:
+apt install update -y
+apt install upgrade -y
+apt install python3 -y
+sudo apt install software-properties-common -y
+sudo add-apt-repository ppa:deadsnakes/ppa -y
+sudo apt update
+sudo apt install python3.8 -y
+python3.8 --version
+sudo apt install python3-pip -y
+pip3 install numpy pandas
+pip --version
+
+python3  : this will take you to space where you can write your code
+to exit the python  workspace ctrl+d
+
+
+
+
+                             NODEJS INSTALLATION ON UBUNTU
+
+if my project Nodejs application?
+
+Install Latest Node.js via NodeSource (Recommended)
+sudo apt update && sudo apt upgrade -y
+sudo apt install -y curl software-properties-common                #Install dependencies:
+curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -  #Add NodeSource repository for latest Node.js:
+               or
+sudo apt install nodejs -y     #Install Node.js and npm:
+sudo apt install npm -y     #Install Node.js and npm
+node -v
+npm -v    #node package manager
+ to run nodejs command use nodejs
+console.log("Hello, my name is nandeesh")
+
+ 
+
+
+
+               
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
