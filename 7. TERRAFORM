@@ -812,6 +812,46 @@ Prevent Destroy: it will not delete the resources
 Ignore changes: it will not replicate the changes we have done to server
 Depends on: it will depend on another resource to create.
 
+provider "aws" {
+  region = "us-east-1"
+}
+
+resource "aws_vpc" "one" {
+  cidr_block = "10.0.0.0/16"
+  tags = {
+    Name = "MyVPC"
+  }
+}
+
+resource "aws_subnet" "two" {
+  cidr_block        = "10.0.1.0/24"
+  vpc_id            = aws_vpc.one.id
+  availability_zone = "us-east-1a"
+  tags = {
+    Name = "MySubnet"
+  }
+}
+
+resource "aws_instance" "three" {
+  ami           = "ami-02a53b0d62d37a757"
+  instance_type = "t2.micro"
+  subnet_id     = aws_subnet.two.id
+
+  tags = {
+    Name = "N.verginia-server"
+  }
+
+  lifecycle {
+    prevent_destroy = true
+    ignore_changes  = [tags]
+  }
+
+  depends_on = [aws_vpc.one, aws_subnet.two]
+}
+
+
+
+
 tERRAFORM REMOTE BACKEND SETUP:
 when we create infra the information of resources will store on state file.
 so it will be tracking the infra information.
