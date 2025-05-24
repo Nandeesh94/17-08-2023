@@ -103,7 +103,11 @@ git branch -D recharge	: to delete a branch
 NOTE: to recover the delete branch
 
 GIT PULL: it will get the branch from github to git
-git pull origin recharge
+git pull origin movies:
+
+git reset --hard origin/movies : Hard reset to remote branch (if in case u give the "git pull origin movies" but it shown * (branch movies  -> FETCH_HEAD
+Already up to date.) but our local repo there is no movies files, use this command.
+
 git checkout recharge
 
 
