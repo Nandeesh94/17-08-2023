@@ -34,6 +34,8 @@ with the plugins we can use tools without installing them.
 GOAL: its a command used to perfrom task.
 MAVEN follows a lifecycle
 
+cd - : this will go the directly previous directory in linux
+
 mvn compile	: to compile the source code
 mvn test	: to test the code
 mvn package	: to create artifact (project directory)
