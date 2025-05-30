@@ -1,0 +1,251 @@
+SAST security tool and DAST security tool what was that?
+
+Great question, Nandeesh! Understanding SAST and DAST is very important in DevSecOps.
+
+🔐 What is SAST and DAST?
+| Type                    | SAST (Static Application Security Testing)                                   | DAST (Dynamic Application Security Testing)                      |
+| ----------------------- | ---------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| 🔍 **What it does**     | Scans **source code** or binaries without running the app                    | Scans the **running application** like a black-box test          |
+| 🧠 **When it's used**   | During **development/build phase** (early in CI pipeline)                    | During **runtime/testing phase** (after deployment or staging)   |
+| 🛠️ **How it works**    | Analyzes code for vulnerabilities like insecure functions, hardcoded secrets | Simulates real-world attacks on the app (SQLi, XSS, auth bypass) |
+| 🕵️ **Access required** | Needs **source code**                                                        | Doesn’t need code, only the **web URL or endpoint**              |
+| ⚙️ **Tools**            | Bandit, SonarQube, Semgrep, Snyk Code, Fortify SCA                           | OWASP ZAP, Burp Suite, Trivy (for web scan), Nikto, Snyk Web     |
+
+
+✅ Examples
+🔎 SAST Example:
+You're writing a Python script:
+password = "mysecret"
+➡️ Bandit or SonarQube will alert you: "Hardcoded credentials detected".
+
+🌐 DAST Example:
+You deploy a website, and the login page doesn’t block SQL injection.
+➡️ OWASP ZAP will try sending:
+' OR '1'='1
+➡️ If it logs in — it flags it as a vulnerability.
+
+
+📌 Summary:
+| Type   | Use For                           | Example Tools                |
+| ------ | --------------------------------- | ---------------------------- |
+| ✅ SAST | Secure coding & Dev phase         | Bandit, SonarQube, Snyk Code |
+| ✅ DAST | Secure deployment & Runtime phase | OWASP ZAP, Burp, Trivy Web   |
+
+
+
+Would you like help setting up both SAST + DAST tools in a GitHub Actions pipeline?
+Yes, Nandeesh! Let's set up both SAST (Static) + DAST (Dynamic) tools in your GitHub Actions pipeline, step by step, using beginner-friendly tools:
+
+✅ Final Goal:
+A GitHub Actions pipeline that:
+Builds your Java WAR project with Maven
+SAST: Scans source code with Bandit (for Python), SonarQube (for Java)
+DAST: Scans your deployed web app with OWASP ZAP
+Deploys to EC2/Tomcat (optional)
+Rollback & backup (optional)
+
+🔧 Step-by-Step Setup
+✅ 1. Set up your repo structure:
+Your repo should look like:
+/
+├── .github/workflows/devsecops.yml
+├── src/                  # Java source code
+├── pom.xml               # Maven build file
+├── app.py (optional)     # Python code (for Bandit)
+├── HTML/login.html       # Frontend
+└── README.md
+
+
+✅ 2. Add GitHub Actions pipeline (.github/workflows/devsecops.yml):
+name: DevSecOps Full Scan
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  devsecops:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+
+    - name: Build with Maven
+      run: mvn clean package
+
+    # -------- SAST: Bandit for Python --------
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+
+    - name: Install Bandit
+      run: pip install bandit
+
+    - name: Run Bandit (Python SAST)
+      run: bandit -r . -ll
+
+    # -------- SAST: SonarQube for Java --------
+    - name: SonarQube Scan (Java SAST)
+      env:
+        SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      run: |
+        curl -sSLo sonar-scanner.zip https://binaries.sonarsource.com/Distribution/sonar-scanner-cli/sonar-scanner-cli-4.7.0.2747-linux.zip
+        unzip sonar-scanner.zip
+        ./sonar-scanner-*/bin/sonar-scanner \
+          -Dsonar.projectKey=your-project-key \
+          -Dsonar.sources=. \
+          -Dsonar.host.url=https://sonarcloud.io \
+          -Dsonar.login=$SONAR_TOKEN
+
+    # -------- DAST: OWASP ZAP --------
+    - name: Run OWASP ZAP baseline scan (DAST)
+      uses: zaproxy/action-baseline@v0.10.0
+      with:
+        target: 'http://<your-ec2-ip>:8080'
+
+
+🔐 3. Set Secrets in GitHub:
+Go to GitHub Repo → Settings → Secrets → Actions and add:
+SONAR_TOKEN → from https://sonarcloud.io/account/security/
+AWS_KEY_ID & AWS_SECRET_ACCESS_KEY (for EC2 deploy, optional)
+
+🚀 4. Optional Deployment & Rollback:
+You can add later:
+EC2 Deployment (scp + ssh)
+S3 backup
+Rollback logic with curl or rsync
+
+🧪 Try It Out
+Push code to main branch. GitHub Actions will:
+Build WAR
+Run Bandit (Python SAST)
+Run SonarQube (Java SAST)
+Run OWASP ZAP (DAST)
+
+
+🔐 SAST vs. DAST:
+| Type   | Tool Used        | Purpose                                                |
+| ------ | ---------------- | ------------------------------------------------------ |
+| ✅ SAST | Trivy, SonarQube | Scan source code and dependencies                      |
+| ✅ DAST | OWASP ZAP        | Test running app like a hacker does (Dynamic App Scan) |
+
+
+✅ Updated GitHub Actions Pipeline with SAST + DAST:
+Below is your updated workflow that includes:
+
+🔍 SAST: Trivy + SonarQube
+🚨 DAST: OWASP ZAP (after app is deployed)
+
+name: Full WAR CI/CD Pipeline
+
+on:
+  push:
+    branches: [main]
+
+env:
+  EC2_IP: <your-ec2-ip>
+  EC2_USER: ubuntu
+  PRIVATE_KEY: ${{ secrets.EC2_PRIVATE_KEY }}
+  WAR_NAME: NETFLIX.war
+  REMOTE_PATH: /var/lib/tomcat9/webapps
+  APP_URL: http://<your-ec2-ip>:8080/NETFLIX  # Update if needed
+
+jobs:
+  build-test-scan-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+
+    - name: Set up Java
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+
+    - name: Build WAR with Maven
+      run: mvn clean package
+
+    - name: Trivy Vulnerability Scan
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: fs
+        scan-ref: .
+
+    - name: SonarQube Scan (SAST)
+      uses: sonarsource/sonarcloud-github-action@master
+      with:
+        projectBaseDir: .
+        args: >
+          -Dsonar.projectKey=<your-key>
+          -Dsonar.organization=<your-org>
+          -Dsonar.host.url=https://sonarcloud.io
+          -Dsonar.login=${{ secrets.SONAR_TOKEN }}
+
+    - name: Deploy WAR to EC2 Tomcat
+      run: |
+        echo "$PRIVATE_KEY" > key.pem
+        chmod 400 key.pem
+        scp -i key.pem target/$WAR_NAME $EC2_USER@$EC2_IP:$REMOTE_PATH
+        ssh -i key.pem $EC2_USER@$EC2_IP "sudo systemctl restart tomcat9"
+
+    - name: (Optional) S3 Backup
+      if: always()
+      run: |
+        echo "Uploading to S3 (optional)..."
+        aws s3 cp target/$WAR_NAME s3://<your-bucket-name>/
+
+    - name: Run OWASP ZAP Scan (DAST)
+      uses: zaproxy/action-baseline@v0.7.0
+      with:
+        target: ${{ env.APP_URL }}
+
+
+✅ What this does:
+| Step | Tool      | Type | Action                                                                |
+| ---- | --------- | ---- | --------------------------------------------------------------------- |
+| ✅ 1  | Trivy     | SAST | Scans code & dependencies for vulnerabilities                         |
+| ✅ 2  | SonarQube | SAST | Scans source code for bugs, smells, security issues                   |
+| ✅ 3  | OWASP ZAP | DAST | Dynamically scans the **deployed** app for web attacks like XSS, SQLi |
+
+
+🔐 Secrets You Must Add:
+In GitHub repo → Settings → Secrets → Actions:
+EC2_PRIVATE_KEY
+SONAR_TOKEN
+(optional) AWS keys for S3: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY
+
+✅ Done!
+You now have a complete DevSecOps pipeline using:
+🧪 Static Analysis (SAST) before deployment
+🛡️ Dynamic Testing (DAST) after deployment
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
