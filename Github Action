@@ -2091,6 +2091,8 @@ Here's a complete GitHub Actions CI/CD pipeline for a Python application that in
 ✅ Rollback support if deployment fails
 
 
+c:mkdir -p .github/workflows
+c:vim .github/workflows/devsecops.yml
 
 ✅ .github/workflows/devsecops-python.yml (This is GITHUB HOSTED RUNNERS)
 
@@ -2180,8 +2182,8 @@ jobs:
           fi
         "
 ---------------------------------------------------------------------------------------
-mkdir -p .github/workflow
-
+c:mkdir -p .github/workflows
+c:vim .github/workflows/devsecops.yml
 ✅ .github/workflows/devsecops-python.yml (This is SELF HOSTED RUNNERS)
 
 name: DevSecOps Python CI/CD Pipeline (Self-Hosted)
@@ -2326,7 +2328,7 @@ flask==2.2.5
 
 ---------------------------------------------------------------------=
 c: mkdir -p test
-c: vim unittest.py
+c: vim test/unittest.py
 ✅ . Full Unit Test Suite (Recommended for DevSecOps CI/CD)
 
 import unittest
