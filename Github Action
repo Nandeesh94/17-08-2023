@@ -2180,6 +2180,7 @@ jobs:
           fi
         "
 ---------------------------------------------------------------------------------------
+mkdir -p .github/workflow
 
 ✅ .github/workflows/devsecops-python.yml (This is SELF HOSTED RUNNERS)
 
@@ -2324,7 +2325,8 @@ if __name__ == "__main__":
 flask==2.2.5
 
 ---------------------------------------------------------------------=
-
+c: mkdir -p test
+c: vim unittest.py
 ✅ . Full Unit Test Suite (Recommended for DevSecOps CI/CD)
 
 import unittest
