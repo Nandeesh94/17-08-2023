@@ -96,5 +96,7 @@ If all goes well, open SonarQube in your browser:
 
 # Restart SonarQube
 /opt/sonarqube/bin/linux-x86-64/sonar.sh restart
-
-
+--------------------------------------------------------------------------------------------------
+FIND ANY DIRECTORY USE THIS 
+c: sudo find / -type d -name "paytm" 2>/dev/null
+---------------------------------------------------------------------------------------------------
