@@ -1,0 +1,397 @@
+Deploy Netflix Clone on Cloud using Jenkins - DevSecOps Project!
+
+
+pipeline {
+    agent any
+
+    tools {
+        jdk 'jdk17'
+        nodejs 'node16'
+    }
+
+    environment {
+        SCANNER_HOME = tool 'sonar-scanner'
+    }
+
+    stages {
+        stage('Clean Workspace') {
+            steps {
+                cleanWs()
+            }
+        }
+
+        stage('Checkout from Git') {
+            steps {
+                git branch: 'main', url: 'https://github.com/N4si/DevSecOps-Project.git'
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                    script {
+                        withSonarQubeEnv('sonar-server') {
+                            sh '''
+                                ${SCANNER_HOME}/bin/sonar-scanner \
+                                -Dsonar.projectName=Netflix \
+                                -Dsonar.projectKey=Netflix \
+                                -Dsonar.sources=. \
+                                -Dsonar.login=$SONAR_TOKEN
+                            '''
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                script {
+                    waitForQualityGate abortPipeline: false, credentialsId: 'sonar-token'
+                }
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                sh 'npm install'
+            }
+        }
+
+        stage('OWASP FS SCAN') {
+            steps {
+                dependencyCheck additionalArguments: '--scan ./ --disableYarnAudit --disableNodeAudit', odcInstallation: 'DP-Check'
+                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+            }
+        }
+
+        stage('TRIVY FS SCAN') {
+            steps {
+                sh 'trivy fs . > trivyfs.txt'
+            }
+        }
+
+        stage('Docker Build & Push') {
+            steps {
+                script {
+                    withDockerRegistry(credentialsId: 'docker', toolName: 'docker') {
+                        sh '''
+                            docker build --build-arg TMDB_V3_API_KEY=<yourapikey> -t netflix .
+                            docker tag netflix nasi101/netflix:latest
+                            docker push nasi101/netflix:latest
+                        '''
+                    }
+                }
+            }
+        }
+
+        stage('TRIVY Image Scan') {
+            steps {
+                sh 'trivy image nasi101/netflix:latest > trivyimage.txt'
+            }
+        }
+
+        stage('Deploy to Container') {
+            steps {
+                sh 'docker run -d --name netflix -p 8081:80 nasi101/netflix:latest'
+            }
+        }
+    }
+
+    post {
+        success {
+            mail to: 'your-email@example.com',
+                 subject: "✅ Build Success: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                 body: "The Jenkins build was successful.\n\nURL: ${env.BUILD_URL}"
+
+            slackSend channel: '#ci-cd-alerts',
+                      color: 'good',
+                      message: "✅ *SUCCESS*: `${env.JOB_NAME}` #${env.BUILD_NUMBER}\n<${env.BUILD_URL}|View Details>"
+        }
+
+        failure {
+            mail to: 'your-email@example.com',
+                 subject: "❌ Build Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                 body: "The Jenkins build failed. Please review the logs.\n\nURL: ${env.BUILD_URL}"
+
+            slackSend channel: '#ci-cd-alerts',
+                      color: 'danger',
+                      message: "❌ *FAILED*: `${env.JOB_NAME}` #${env.BUILD_NUMBER}\n<${env.BUILD_URL}|Check logs>"
+        }
+
+        unstable {
+            mail to: 'your-email@example.com',
+                 subject: "⚠️ Build Unstable: ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                 body: "The build is unstable and needs attention.\n\nURL: ${env.BUILD_URL}"
+
+            slackSend channel: '#ci-cd-alerts',
+                      color: 'warning',
+                      message: "⚠️ *UNSTABLE*: `${env.JOB_NAME}` #${env.BUILD_NUMBER}\n<${env.BUILD_URL}|Investigate>"
+        }
+    }
+}
+
+-----------------------------------------------------------------------
+✅ Step-by-Step Integration: Email and Slack Notifications in Jenkins
+
+🔧 1. Pre-Requisites in Jenkins:
+📨 For Email:
+Configure SMTP under:
+Manage Jenkins → Configure System → Extended E-mail Notification
+Add:
+SMTP Server (e.g., smtp.gmail.com)
+Port: 587
+Use Authentication (Email + App Password)
+Default content-type: text/html
+
+💬 For Slack:
+Install Slack Notification Plugin
+In Slack:
+Create a Slack App → Add Incoming Webhooks
+Choose a channel (e.g., #ci-cd-alerts)
+Copy webhook URL
+In Jenkins:
+
+Go to: Manage Jenkins → Configure System → Slack
+Add:
+Team Domain
+Integration Token / Webhook URL
+Channel name (e.g., #ci-cd-alerts)
+Test connection
+
+🧪 2. Add Notification Stages to Pipeline
+We’ll add two post block notifications inside the pipeline.
+
+
+
+-----------------------------------
+
+If you get docker login failed errorr
+
+sudo su
+sudo usermod -aG docker jenkins
+sudo systemctl restart jenkins
+------------------------------------------------------------------------------------------
+
+✅ Step-by-Step: Configure sonar-scanner in Jenkins
+
+1. Go to Jenkins UI
+Open: http://<your-jenkins-ip>:8080/
+
+Click: Manage Jenkins
+
+Click: Global Tool Configuration
+
+2. Scroll to "SonarQube Scanner" Section
+If SonarQube Scanner is not visible:
+🔧 Go to Manage Plugins and install:
+
+✅ SonarQube Scanner for Jenkins plugin
+
+3. Add SonarQube Scanner
+Click Add SonarQube Scanner
+
+Name: sonar-scanner (🔴 Must match your tool name in Jenkinsfile)
+
+Check ✅ Install automatically
+
+Choose version: e.g., sonar-scanner-4.7.0.2747 or latest
+
+✅ Click Save
+
+4. (Optional) Configure SonarQube Server
+Also in Manage Jenkins → Configure System:
+
+Find the SonarQube Servers section
+
+Click Add SonarQube
+
+Name: SonarQube
+
+Server URL: http://<your-sonarqube-ip>:9000
+
+Authentication Token: add via "Add Credentials"
+
+✅ Click Save
+
+--------------------------------------------------------------------------
+✅ Step-by-Step: Configure jdk17 and node16 in Jenkins
+
+
+🔧 1. Go to Jenkins Dashboard
+Click: Manage Jenkins → Global Tool Configuration
+
+☕️ 2. Add JDK (jdk17)
+🔽 Scroll to JDK section:
+Click Add JDK
+
+Name: jdk17 ✅ (must match exactly in your pipeline)
+
+Uncheck ✅ Install automatically if you want to give a custom path
+
+✅ Or check Install automatically and select OpenJDK 17 or provide download URL.
+
+
+ 3. Add Node.js (node16)
+
+Step-by-Step: Enable NodeJS in Jenkins
+🔧 Step 1: Install the NodeJS Plugin
+Go to Manage Jenkins → Plugin Manager
+
+Click on the Available tab
+
+Search for:
+👉 NodeJS Plugin
+
+✅ Check the box next to it
+
+Click Install without restart
+
+Step 2: Refresh Global Tool Configuration
+After installing the plugin:
+
+Go back to: Manage Jenkins → Global Tool Configuration
+
+Now you will see a new section called NodeJS
+
+Click Add NodeJS
+
+Name: node16.0.0 ✅ (exact name for your pipeline)
+
+Tick ✅ Install automatically
+
+Choose NodeJS 16.x
+
+Then click Save.
+
+-----------------------------------------------------------------
+
+🔐 Step-by-Step: Add Sonar Token to Jenkins Credentials
+
+✅ 1. Go to Global Credentials
+Click "Manage Jenkins" on the left sidebar.
+
+Scroll and click “Credentials”.
+
+✅ 3. Select Global Scope
+Click on "(global)" or the folder scope where you want to store the token.
+
+Then click "Add Credentials" on the left sidebar.
+
+✅ 4. Fill the Credential Form
+In the Add Credentials page:
+
+Field	What to Enter
+Kind	🔒 Secret text
+Secret	🎯 Paste your SonarQube token (from SonarQube UI → My Account → Security → Generate Token)
+ID	sonar-token ← ✅ Use this exact ID in your pipeline
+Description	(Optional) e.g., SonarQube Token for Jenkins DevSecOps pipeline
+
+✅ 5. Click Save
+After filling in the form, click "OK" or "Add" to save the credential.
+
+Your token is now securely stored and ready to be used in pipelines.
+
+-----------------------------------------------------------------------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
