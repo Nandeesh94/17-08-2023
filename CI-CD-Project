@@ -132,6 +132,28 @@ pipeline {
 }
 
 -----------------------------------------------------------------------
+
+To fix the cleanWs() step, you need to install the Pipeline Utility Steps plugin in Jenkins.
+
+✅ Step-by-Step: Install Pipeline Utility Steps Plugin
+🔧 1. Go to Jenkins Dashboard
+Click: Manage Jenkins
+Then click: Plugin Manager
+
+🔍 2. Find the Plugin
+Go to the Available tab
+In the search box, type: Pipeline Utility Steps
+
+✅ Check the box next to Pipeline Utility Steps Plugin
+
+🔄 3. Install It
+Click: Install without restart
+Let it finish installing. After that, Jenkins will recognize the cleanWs() step.
+
+💡 What does cleanWs() do?
+This command clears the Jenkins workspace before a build starts, to avoid using any leftover files or caches from previous builds.
+
+-----------------------------------------------------------------------
 ✅ Step-by-Step Integration: Email and Slack Notifications in Jenkins
 
 🔧 1. Pre-Requisites in Jenkins:
