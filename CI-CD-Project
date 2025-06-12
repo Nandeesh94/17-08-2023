@@ -172,14 +172,38 @@ sudo su
 sudo usermod -aG docker jenkins
 sudo systemctl restart jenkins
 ------------------------------------------------------------------------------------------
+✅  SonarQube server configuration:
 
-✅ Step-by-Step: Configure sonar-scanner in Jenkins
+ the "SonarQube Scanner" section — which installs the scanner tool (CLI), not the SonarQube server configuration that Jenkins uses during withSonarQubeEnv('sonar-server').
+
+✅ You need to configure the SonarQube Server separately:
+Here’s how to properly configure the SonarQube Server (not just the scanner):
+
+🔧 Step-by-Step: Add SonarQube Server (sonar-server) in Jenkins
+1. Go to Jenkins Dashboard
+http://<your-jenkins-ip>:8080
+
+2. Click “Manage Jenkins”
+3. Go to “Configure System” (⚠️ Not “Global Tool Configuration” this time)
+4. Scroll down to the section called “SonarQube servers”
+5. Click “Add SonarQube”
+Now you'll see the “Name” field where you can enter:
+Name: sonar-server ✅ (must match your pipeline)
+Server URL: http://<your-sonarqube-ip>:9000
+Server Authentication Token:
+Click Add → Jenkins → Secret text
+Paste your SonarQube token (from SonarQube UI → My Account → Security → Tokens)
+Give the secret an ID (e.g., sonar-token)
+Then select it here from the dropdown
+
+6. ✅ Check the box “Enable injection of SonarQube server configuration...” (optional but recommended)
+7. Click Save
+--------------------------------------------------------------------------------------------------
+✅ Step-by-Step: sonar-scanner configuration in Jenkins
 
 1. Go to Jenkins UI
 Open: http://<your-jenkins-ip>:8080/
-
 Click: Manage Jenkins
-
 Click: Global Tool Configuration
 
 2. Scroll to "SonarQube Scanner" Section
