@@ -340,7 +340,37 @@ Your token is now securely stored and ready to be used in pipelines.
 
 -----------------------------------------------------------------------------------
 
+✅ Step-by-Step: Set Up OWASP Dependency-Check Plugin in Jenkins
 
+🔧 1. Install the Plugin
+Login to Jenkins (http://<your-jenkins-ip>:8080)
+Go to “Manage Jenkins”
+Click on “Manage Plugins”
+Go to the “Available” tab
+In the search bar, type:
+OWASP Dependency-Check
+✅ Check the box for "OWASP Dependency-Check Plugin"
+Click “Install without restart”
+🔄 Wait until the plugin is installed.
+
+🛠️ 2. Configure the Tool: Global Tool Configuration
+After installing the plugin, now configure the scanner tool and give it the name DP-Check.
+📍 Steps:
+Go to “Manage Jenkins”
+Click on “Global Tool Configuration”
+Scroll down to find section:
+
+🔹 Dependency-Check
+Click “Add Dependency-Check”
+Set the following:
+Name:
+DP-Check
+This is the name your Jenkinsfile refers to.
+
+✅ Install automatically → ✔️ Check this box
+Click Save at the bottom of the page
+
+-------------------------------------------------------------------------------------------
 
 
 
