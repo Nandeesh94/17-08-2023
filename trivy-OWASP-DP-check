@@ -1,0 +1,56 @@
+#!/bin/bash
+
+set -e
+
+echo "🔧 Installing Trivy..."
+# Install wget, unzip, git if not already installed
+sudo yum install -y wget unzip git
+
+# Download and install Trivy (latest RPM)
+TRIVY_VERSION="0.51.1"
+wget https://github.com/aquasecurity/trivy/releases/download/v${TRIVY_VERSION}/trivy_${TRIVY_VERSION}_Linux-64bit.rpm
+sudo rpm -ivh trivy_${TRIVY_VERSION}_Linux-64bit.rpm
+rm -f trivy_${TRIVY_VERSION}_Linux-64bit.rpm
+
+echo "✅ Trivy installed: $(trivy --version | head -n 1)"
+
+echo "🛡️ Installing OWASP Dependency-Check..."
+# Create install directory
+sudo mkdir -p /opt/owasp
+cd /opt/owasp
+
+# Download and unzip Dependency-Check
+ODC_VERSION="8.4.0"
+wget https://github.com/jeremylong/DependencyCheck/releases/download/v${ODC_VERSION}/dependency-check-${ODC_VERSION}-release.zip
+unzip -o dependency-check-${ODC_VERSION}-release.zip
+
+# Copy contents safely into target folder
+sudo mkdir -p /opt/owasp/dependency-check
+sudo cp -r dependency-check/* /opt/owasp/dependency-check/
+rm -rf dependency-check
+rm -f dependency-check-${ODC_VERSION}-release.zip
+
+# Make the script executable
+sudo chmod +x /opt/owasp/dependency-check/bin/dependency-check.sh
+
+# Optional: Add to PATH if not already present
+if ! grep -q "dependency-check/bin" ~/.bashrc; then
+  echo 'export PATH=$PATH:/opt/owasp/dependency-check/bin' >> ~/.bashrc
+  source ~/.bashrc
+fi
+
+echo "✅ Dependency-Check installed: $(/opt/owasp/dependency-check/bin/dependency-check.sh --version)"
+
+echo "🎉 All tools installed successfully!"
+
+Run Manually:
+# (Recommended) Add It to PATH Permanently
+#vim ~/.bashrc
+#At the bottom, add:
+#export PATH=$PATH:/opt/owasp/dependency-check/bin
+#:wq  Save and exit
+# Run the bashrc
+#source ~/.bashrc
+#dependency-check.sh --version   :now check the version
+
+
