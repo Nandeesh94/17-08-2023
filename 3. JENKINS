@@ -651,3 +651,128 @@ pipeline {
         }
     }
 }
+-------------------------------------------------------------------------------------------------------
+
+Perfect, Nandeesh! Here's a complete and enhanced Jenkins pipeline that includes:
+
+✅ What's Added:
+Quality Gate stage via waitForQualityGate
+
+OWASP Scans:
+
+✅ Trivy for file system scan
+
+✅ Dependency-Check for open-source vulnerability scanning
+
+Rollback step — triggered if deployment fails
+
+--------------------------------------------->
+
+✅ Final Jenkinsfile with All Enhancements:
+pipeline {
+    agent { label 'slave1' }
+
+    tools {
+        jdk 'jdk17'
+        maven 'maven3.9.9'
+    }
+
+    environment {
+        SCANNER_HOME = tool 'sonar-scanner'
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/devopsbyraham/jenkins-java-project.git'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'mvn compile'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+
+        stage('Code Quality - SonarQube') {
+            steps {
+                withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                    sh '''
+                        mvn sonar:sonar \
+                          -Dsonar.projectKey=project-netflix \
+                          -Dsonar.host.url=http://52.47.193.26:9000 \
+                          -Dsonar.login=$SONAR_TOKEN
+                    '''
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 5, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
+        stage('Trivy File System Scan') {
+            steps {
+                sh '''
+                    echo "🔍 Running Trivy file system scan..."
+                    trivy fs . --severity HIGH,CRITICAL --exit-code 0 --skip-dirs node_modules,target
+                '''
+            }
+        }
+
+        stage('OWASP Dependency-Check') {
+            steps {
+                dependencyCheck additionalArguments: '--scan ./ --format XML --out dependency-check-report', odcInstallation: 'DP-Check'
+                dependencyCheckPublisher pattern: '**/dependency-check-report/dependency-check-report.xml'
+            }
+        }
+
+        stage('Package Artifact') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+
+        stage('Deploy to Tomcat') {
+            steps {
+                script {
+                    try {
+                        deploy adapters: [
+                            tomcat9(
+                                credentialsId: 'a3f384b0-0de7-4b62-9800-24043d1d135d',
+                                path: '',
+                                url: 'http://13.39.49.204:8080/'
+                            )
+                        ],
+                        contextPath: 'netflix',
+                        war: 'target/*.war'
+                        echo "✅ Deployment successful"
+                    } catch (err) {
+                        echo "❌ Deployment failed. Triggering rollback..."
+                        sh '''
+                            curl -X POST http://13.39.49.204:8080/manager/text/undeploy?path=/netflix \
+                              --user <username>:<password>
+                        '''
+                        error("Rolled back due to deployment failure")
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+
+
+
+
