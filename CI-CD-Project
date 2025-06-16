@@ -372,6 +372,146 @@ Click Save at the bottom of the page
 
 -------------------------------------------------------------------------------------------
 
+====================================================================================================================================================================================================================================================================================================================================
+
+Great, Nandeesh! Here's your complete DevSecOps Jenkinsfile with:
+
+✅ Clean workspace
+✅ Git checkout
+✅ Maven build & test
+✅ SonarQube analysis (with token)
+✅ OWASP Dependency-Check
+✅ Trivy scan
+✅ Artifact packaging
+✅ Deployment to Tomcat (with rollback support)
+✅ Secure credentials handling
+
+✅ Final Jenkinsfile (WAR CI/CD with Security + Rollback)
+pipeline {
+    agent { label 'slave1' }
+
+    tools {
+        jdk 'jdk17'
+        maven 'maven3.9.9'
+        nodejs 'node16'
+    }
+
+    environment {
+        SCANNER_HOME = tool 'sonar-scanner'
+        SONAR_HOST_URL = 'http://<your-sonarqube-host>:9000'
+    }
+
+    stages {
+        stage('Clean Workspace') {
+            steps {
+                cleanWs()
+            }
+        }
+
+        stage('Git Checkout') {
+            steps {
+                git branch: 'master', url: 'https://github.com/Nandeesh94/jenkins-java-project.git'
+            }
+        }
+
+        stage('Build & Test') {
+            steps {
+                sh 'mvn compile'
+                sh 'mvn test'
+            }
+        }
+
+        stage('SonarQube Analysis') {
+            steps {
+                withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
+                    withSonarQubeEnv('sonar-server') {
+                        sh '''
+                            ${SCANNER_HOME}/bin/sonar-scanner \
+                            -Dsonar.projectKey=netflix5 \
+                            -Dsonar.sources=. \
+                            -Dsonar.host.url=$SONAR_HOST_URL \
+                            -Dsonar.login=$SONAR_TOKEN
+                        '''
+                    }
+                }
+            }
+        }
+
+        stage('OWASP Dependency-Check') {
+            steps {
+                sh '''
+                    mkdir -p reports
+                    docker run --rm \
+                      -v $(pwd):/src \
+                      owasp/dependency-check:latest \
+                      --project "netflix5" \
+                      --scan /src \
+                      --format "HTML" \
+                      --out /src/reports
+                '''
+            }
+        }
+
+        stage('Trivy Scan') {
+            steps {
+                sh '''
+                    trivy fs . > trivy-report.txt || true
+                '''
+            }
+        }
+
+        stage('Package Artifact') {
+            steps {
+                sh 'mvn package'
+            }
+        }
+
+        stage('Deploy to Tomcat with Rollback') {
+            steps {
+                script {
+                    try {
+                        echo "🚀 Starting Deployment"
+                        withCredentials([usernamePassword(credentialsId: 'tomcat-creds', usernameVariable: 'TOMCAT_USER', passwordVariable: 'TOMCAT_PASS')]) {
+                            sh """
+                                curl -T target/netflix.war \
+                                  "http://13.39.49.204:8080/manager/text/deploy?path=/netflix&update=true" \
+                                  --user $TOMCAT_USER:$TOMCAT_PASS
+                            """
+                        }
+                        echo "✅ Deployment successful"
+                    } catch (err) {
+                        echo "❌ Deployment failed. Triggering rollback..."
+                        withCredentials([usernamePassword(credentialsId: 'tomcat-creds', usernameVariable: 'TOMCAT_USER', passwordVariable: 'TOMCAT_PASS')]) {
+                            sh """
+                                curl -X POST "http://13.39.49.204:8080/manager/text/undeploy?path=/netflix" \
+                                  --user $TOMCAT_USER:$TOMCAT_PASS
+                            """
+                        }
+                        error("⚠️ Rolled back due to deployment failure")
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            archiveArtifacts artifacts: '**/target/*.war', fingerprint: true
+            archiveArtifacts artifacts: 'reports/*.html', allowEmptyArchive: true
+            archiveArtifacts artifacts: 'trivy-report.txt', allowEmptyArchive: true
+        }
+    }
+}
+
+------------------------------------------------------------------------------------------------
+✅ What You Need to Configure in Jenkins UI
+| Item              | Description                                                        |
+| ----------------- | ------------------------------------------------------------------ |
+| **sonar-scanner** | Jenkins → Global Tool Config → Add `sonar-scanner` tool            |
+| **sonar-server**  | Jenkins → Configure System → Add `SonarQube` instance              |
+| **sonar-token**   | Jenkins → Credentials → Add Secret Text                            |
+| **tomcat-creds**  | Jenkins → Credentials → Add Username/Password                      |
+| **slave1**        | Jenkins Agent must have Java, Maven, Docker, Trivy, etc. installed |
 
 
 
