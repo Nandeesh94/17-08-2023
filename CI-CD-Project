@@ -518,8 +518,46 @@ pipeline {
 
 
 
+========================================================================================================
 
 
+trivy and OWASP dependecies installed in slave1 after..
+🔍 Your Current DevSecOps Setup.
+| Tool                       | Version  | Purpose                                                                 |
+| -------------------------- | -------- | ----------------------------------------------------------------------- |
+| **Trivy**                  | `0.51.1` | Scans containers, filesystems, Git repos, dependencies (SCA)            |
+| **OWASP Dependency-Check** | `8.4.0`  | Scans Java (Maven/Gradle) and other project dependencies for known CVEs |
+
+✅ Both tools are installed and working properly on your EC2 instance. Great job!
+
+✅ Next Steps (Recommended Actions)
+
+✅. Test Scans Locally (Manual First)
+1.Trivy on directory:
+trivy fs . --scanners vuln,secret,config --severity HIGH,CRITICAL
+
+2.Dependency-Check on Maven project:
+dependency-check.sh --project "netflix-java" --scan . --format HTML --out reports/
+
+You can open the HTML report from reports/ directory for a visual summary.
+
+✅. Integrate into Jenkins
+Add these as pipeline stages in your Jenkinsfile:
+
+stage('Trivy Scan') {
+    steps {
+        sh 'trivy fs . --scanners vuln,secret,config --exit-code 1 --severity HIGH,CRITICAL'
+    }
+}
+
+stage('OWASP Dependency-Check') {
+    steps {
+        sh '''
+            mkdir -p reports
+            dependency-check.sh --project "netflix-java" --scan . --format HTML --out reports/
+        '''
+    }
+}
 
 
 
