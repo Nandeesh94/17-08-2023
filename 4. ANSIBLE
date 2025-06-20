@@ -654,7 +654,118 @@ ANSIBLE-GALAXY: used to store playbooks like code on github.
 ansible-galaxy search java
 ansible-galaxy install akhilesh9589.tomcat
 ansible-galaxy search --author alikins
+=====================================================================================================================
 
+Here’s your DevSecOps Ansible Playbook converted to the pattern you showed (using short vars like a, b, c, etc.). I’ve mapped 
+the original tasks accordingly while preserving logic, tags, and variable structure:
+
+✅ DevSecOps Playbook – Condensed Var Pattern
+---
+- hosts: all
+  become: yes
+  vars:
+    a: git
+    b: maven
+    c: docker
+    d: python3
+    e: python3-pip
+    f: bandit
+    g: started
+    h: https://github.com/aquasecurity/trivy/releases/latest/download/trivy_0.51.1_Linux-64bit.deb
+    i: /tmp/trivy.deb
+    j: nginx:latest
+    k: /opt/myapp
+
+  tasks:
+    - name: Install {{ a }}
+      yum: name={{ a }} state=present
+      tags: ["1"]
+
+    - name: Install {{ b }}
+      yum: name={{ b }} state=present
+      tags: ["2"]
+
+    - name: Install {{ c }}
+      yum: name={{ c }} state=present
+      tags: ["3"]
+
+    - name: Install Python
+      yum: name={{ d }} state=present
+      tags: ["4"]
+
+    - name: Install pip
+      yum: name={{ e }} state=present
+      tags: ["5"]
+
+    - name: Enable & start Docker
+      systemd:
+        name: "{{ c }}"
+        enabled: yes
+        state: "{{ g }}"
+      tags: ["6"]
+
+    - name: Add user to docker group
+      user:
+        name: "{{ ansible_user }}"
+        groups: "{{ c }}"
+        append: yes
+      tags: ["7"]
+
+    - name: Install Bandit
+      pip:
+        name: "{{ f }}"
+      tags: ["8"]
+
+    - name: Download Trivy
+      get_url:
+        url: "{{ h }}"
+        dest: "{{ i }}"
+      tags: ["9"]
+
+    - name: Install Trivy
+      apt:
+        deb: "{{ i }}"
+      when: ansible_os_family == "Debian"
+      tags: ["10"]
+
+    - name: Allow SSH port through UFW
+      ufw:
+        rule: allow
+        port: "22"
+        proto: tcp
+      when: ansible_os_family == "Debian"
+      tags: ["11"]
+
+    - name: Enable UFW
+      ufw:
+        state: enabled
+      when: ansible_os_family == "Debian"
+      tags: ["12"]
+
+    - name: Run Bandit scan on {{ k }}
+      shell: bandit -r {{ k }}
+      register: bandit_output
+      ignore_errors: yes
+      tags: ["13"]
+
+    - name: Show Bandit output
+      debug:
+        var: bandit_output.stdout_lines
+      tags: ["14"]
+
+    - name: Run Trivy scan on image {{ j }}
+      shell: trivy image {{ j }}
+      register: trivy_output
+      ignore_errors: yes
+      tags: ["15"]
+
+    - name: Show Trivy output
+      debug:
+        var: trivy_output.stdout_lines
+      tags: ["16"]
+
+
+=====================================================================================================================
 HISTORY:
 158  ll
   159  vim raham.yml
