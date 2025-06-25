@@ -430,7 +430,71 @@ HISTORY:
    70  history
 [root@ip-172-31-12-122 ~]#
 ====================================================================LINK: https://www.w3schools.com/howto/tryit.asp?filename=tryhow_css_form_icon
+===============================================================================================================================
 
+ Production-Ready, Secure Dockerfile (Tomcat + Java + DevSecOps Best Practices):
+
+# Use a minimal, secure base image with Java preinstalled
+FROM eclipse-temurin:17-jre-alpine
+
+# Set maintainer metadata (no secrets)
+LABEL maintainer="nandeesh"
+LABEL project="Netflix Clone - Production"
+
+# Set environment variables (safe only for non-secrets)
+ENV CLIENT=swiggy
+ENV AUTHOR=vijay
+
+# Define working directory
+WORKDIR /opt
+
+# Download Tomcat with checksum verification
+RUN apk add --no-cache curl && \
+    curl -O https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.106/bin/apache-tomcat-9.0.106.tar.gz && \
+    curl -O https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.106/bin/apache-tomcat-9.0.106.tar.gz.sha512 && \
+    sha512sum -c apache-tomcat-9.0.106.tar.gz.sha512 && \
+    tar -xzf apache-tomcat-9.0.106.tar.gz && \
+    mv apache-tomcat-9.0.106 tomcat && \
+    rm -f apache-tomcat-9.0.106.tar.gz apache-tomcat-9.0.106.tar.gz.sha512
+
+# Copy application WAR to Tomcat (Use multi-stage in real-world for building WAR)
+COPY target/app.war /opt/tomcat/webapps/ROOT.war
+
+# Harden permissions
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup && \
+    chown -R appuser:appgroup /opt/tomcat
+
+USER appuser
+
+# Expose intended port
+EXPOSE 8080
+
+# Define volume for persistent data/logs if needed
+VOLUME ["/opt/tomcat/logs"]
+
+# Start Tomcat
+ENTRYPOINT ["/opt/tomcat/bin/catalina.sh"]
+CMD ["run"]
+
+--------------------------------------------------------------------------------------
+
+🔒 Why this is Production & DevSecOps Friendly
+
+✅ Uses lightweight, secure Eclipse Temurin OpenJDK image based on Alpine.
+✅ Only installs minimal required tools (curl).
+✅ Checksum verification for Tomcat download — prevents tampering.
+✅ Non-root user enforced for container runtime security.
+✅ Minimal, predictable structure.
+✅ Persistent volume defined for logs.
+✅ Clean removal of unnecessary files — reduces image size.
+✅ Clear separation of ENTRYPOINT and CMD.
+
+
+
+
+
+
+=============================================================================================================================
 PROCESS: 
 CODE -- > BUILD (DOCKER FILE) -- > IMAGE -- > CONTAINER -- > APP
 http://3.7.248.36:81/
