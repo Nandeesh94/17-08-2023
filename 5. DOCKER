@@ -341,6 +341,7 @@ create a connection and attach a volume for it
 touch raham{1..10}
 docker inspect cont6
 docker volume inspect volume4
+docker volume inspect volume4 | grep -i mountpoint
 cp * /var/lib/docker/volumes/volume4/_data
 
 
