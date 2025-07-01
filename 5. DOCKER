@@ -480,6 +480,11 @@ CMD ["run"]
 --------------------------------------------------------------------------------------
 ===================================================================================================================
 
+C: git clone https://github.com/Nandeesh94/jenkins-java-project.git
+C: apt install git maven -y
+C: cd jenkins-java-project.git/jenkins-java-project.git
+C: mvn clean package
+C: vim Dockerfile
 FROM eclipse-temurin:17-jre-alpine
 LABEL maintainer="nandeesh"
 LABEL project="Netflix clone-production"
@@ -517,6 +522,30 @@ xxxxxxx        netflix:latestv2    0.0.0.0:8080->8080/tcp   cont3
 docker logs -f cont3 : (This shows Tomcat logs in real time.You can exit log view anytime with Ctrl + C.It won't stop the container.)
 ✅ Access Tomcat
 http://44.211.136.99:8080
+----------------------------------------------------
+
+sudo mkdir -p /usr/local/lib/docker/cli-plugins
+sudo curl -SL https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/lib/docker/cli-plugins/docker-compose
+sudo chmod +x /usr/local/lib/docker/cli-plugins/docker-compose
+docker compose version
+
+vim docker-compose.yml
+version: '3.8'
+services:
+  tomcat:
+    image: netflix:latestv7
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
+    volumes:
+      - /opt/tomcat/logs:/opt/tomcat/logs
+      - /opt/tomcat/work:/opt/tomcat/work
+    security_opt:
+      - "no-new-privileges:true"
+
 
 ===========================================================================================
 
