@@ -668,8 +668,31 @@ docker-compose stop
 Supported filenames: docker-compose.yml, docker-compose.yaml, compose.yml, compose.yaml
 docker-compose -f raham.yml stop
 
-=================================
 
+
+==========================================================================================
+C: vim Dockerfile
+FROM ubuntu:22.04
+RUN apt update -y
+Run apt install apache2 -y
+COPY index.html /var/www/html/index.html
+EXPOSE 80
+CMD ["/usr/sbin/apachectl", "-D", "FOREGROUND"]
+
+vim index.html
+ update the paytm movies
+            paytm train
+            paytm dth
+            paytm recharge
+C: docker build -t nandu90199/train-nandu:latest .
+C: docker tag movies:v1 nandu90199/movies-nandu:latest
+C: docker push nandu90199/movies-nandu:latest
+C: docker service create --name movies --replicas=6 --publish 91:80 nandu90199/movies-nandu:latest
+C: http://<your-public-ip>:91
+ Now, you should see your Paytm Train Registration Form,
+
+
+=========================================================================================
 DOCKER HUB:
 Its a central platfrom used to store docker images.
 image we create on host then we will push them to dockerhub.
