@@ -684,6 +684,7 @@ password:
 
 docker tag image:v1 username/reponame
 docker push username/reponame
+(if in case anything untaged [docker rmi nandu90199/movies-nandu]) use this method.
 
 
 
