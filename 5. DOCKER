@@ -707,6 +707,7 @@ systemctl status docker
 
 2. set the hostnames:
 hostnamectl set-hostname manager/worker-1/worker-2
+sudo -i
 
 3. generate and copy token:
 manager node: docker swarm init
