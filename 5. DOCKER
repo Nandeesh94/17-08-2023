@@ -679,7 +679,8 @@ repo types: 1. public 2. private repo
 
 ACCOUNT:
 build a docker image with doker file.
-docker login: username and password
+docker login -u username
+password:
 
 docker tag image:v1 username/reponame
 docker push username/reponame
