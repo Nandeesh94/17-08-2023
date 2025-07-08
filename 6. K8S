@@ -192,6 +192,8 @@ kubectl describe deploy swiggy-rs
 kubectl edit deploy/swiggy-rs
 kubectl delete deploy swiggy-r
 kubectl delete po --all
+kubectl get pods -l app=swiggy
+
 
 kubectl rollout restart deployment zomoto-rs
 
@@ -849,3 +851,139 @@ HISTORY:
    74  kops delete cluster --name rahams.k8s.local --yes
    75  history
 [root@ip-172-31-45-202 ~]#
+==========================================================================================================================
+
+Here is your complete EKS DevSecOps GitHub Repo Structure with example code:
+
+✅ Includes:
+EKS Cluster creation script
+Trivy, Falco, Gatekeeper Helm charts
+OPA/Gatekeeper policies
+
+GitHub Actions & Jenkins CI scans
+eks-devsecops/
+├── eks-cluster/
+│   ├── create-eks-cluster.sh
+│   ├── config.yaml
+├── helm-charts/
+│   ├── trivy/
+│   │   └── values.yaml
+│   ├── falco/
+│   │   └── values.yaml
+│   ├── gatekeeper/
+│   │   └── values.yaml
+├── policies/
+│   ├── gatekeeper-policies/
+│   │   └── disallow-privileged-containers.yaml
+│   ├── pod-security.yaml
+└── ci-cd/
+    ├── GitHubActions.yml
+    └── Jenkinsfile
+
+# eks-cluster/create-eks-cluster.sh
+#!/bin/bash
+
+# Ensure AWS CLI, kubectl and eksctl are configured
+REGION=us-east-1
+CLUSTER_NAME=eks-devsecops
+NODE_TYPE=t3.medium
+NODE_COUNT=2
+
+eksctl create cluster \
+  --name $CLUSTER_NAME \
+  --version 1.29 \
+  --region $REGION \
+  --nodegroup-name workers \
+  --node-type $NODE_TYPE \
+  --nodes $NODE_COUNT \
+  --nodes-min 2 \
+  --nodes-max 4 \
+  --managed
+
+# eks-cluster/config.yaml
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+metadata:
+  name: eks-devsecops
+  region: us-east-1
+nodeGroups:
+  - name: ng1
+    instanceType: t3.medium
+    desiredCapacity: 2
+
+# helm-charts/trivy/values.yaml
+image:
+  repository: aquasec/trivy
+  tag: latest
+
+# helm-charts/falco/values.yaml
+falcosidekick:
+  enabled: true
+
+# helm-charts/gatekeeper/values.yaml
+replicaCount: 2
+
+# policies/gatekeeper-policies/disallow-privileged-containers.yaml
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sPSPPrivilegedContainer
+metadata:
+  name: disallow-privileged
+spec:
+  match:
+    kinds:
+      - apiGroups: [""]
+        kinds: ["Pod"]
+
+# policies/pod-security.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: secure-pod
+spec:
+  containers:
+  - name: secure
+    image: nginx
+    securityContext:
+      runAsUser: 1000
+      allowPrivilegeEscalation: false
+
+# ci-cd/GitHubActions.yml
+name: CI-Trivy-Scan
+on:
+  push:
+    branches: [ main ]
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Trivy scan
+      uses: aquasecurity/trivy-action@master
+      with:
+        image-ref: 'nandu90199/movies0:latest'
+        format: 'table'
+        exit-code: '1'
+        severity: 'CRITICAL,HIGH'
+
+# ci-cd/Jenkinsfile
+pipeline {
+    agent any
+    stages {
+        stage('Checkout') {
+            steps { git 'https://github.com/Nandeesh94/Docker-project3.git' }
+        }
+        stage('Trivy Scan') {
+            steps {
+                sh 'docker pull nandu90199/movies0:latest'
+                sh 'trivy image --exit-code 1 --severity HIGH,CRITICAL nandu90199/movies0:latest'
+            }
+        }
+        stage('Build & Deploy') {
+            steps {
+                echo 'Build and Deploy stages go here'
+            }
+        }
+    }
+}
+
