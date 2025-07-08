@@ -205,6 +205,67 @@ chmod +x kubecolor
 mv kubecolor /usr/local/bin/
 kubecolor get po
 
+======================================================================================================================
+
+Devsecops prospective:
+vim raham.yml
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: swiggy-rs
+  labels:
+    app: swiggy
+  annotations:
+    secops.audit: "enabled"
+    contact.owner: "devsecops@nandu.com"
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: swiggy
+  template:
+    metadata:
+      labels:
+        app: swiggy
+    spec:
+      containers:
+      - name: cont1
+        image: nginx:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+        resources:
+          limits:
+            memory: "128Mi"
+            cpu: "500m"
+          requests:
+            memory: "64Mi"
+            cpu: "250m"
+        securityContext:
+          allowPrivilegeEscalation: false
+          runAsNonRoot: true
+          runAsUser: 1000
+          readOnlyRootFilesystem: true
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 10
+          periodSeconds: 15
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 80
+          initialDelaySeconds: 5
+          periodSeconds: 10
+
+🧪 Test Commands:
+kubectl apply -f swiggy-secure-deployment.yaml
+kubectl describe pod -l app=swiggy
+kubectl get pods -o wide
+======================================================================================================================
+
 HISTORY:
 1  vim minikube.sh
     2  sh minikube.sh
