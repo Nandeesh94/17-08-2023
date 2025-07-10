@@ -89,3 +89,58 @@ Add data source -- > loki  -- > url: http://13.233.139.224:3100 -- > save & tets
 
 Checking logs in Loki:
 Explore -- > Label filters -- > jobs=varlogs -- > run query
+
+
+====================================================================================================================================
+
+
+                           = Grafana =
+
+HOME -> ALERTING -> CONTACT POINT -> Create New contact point
+-> Name [ Nandeesh ] -> Integration [Email] -> Addresses [ nandeeshgm20@gmail.com ] -> test --- below process
+
+✅ Step-by-Step: Enable Email Alerting in Grafana
+
+✅ 1. 📦 Install Mail Transfer Agent (Postfix/Sendmail/SSMTP/Exim4)
+If not already installed, install something like ssmtp or Postfix:
+
+sudo yum install postfix -y  # RHEL-based
+# or
+sudo apt install postfix -y  # Debian-based
+
+✅ 2. ✏️ Configure SMTP in grafana.ini
+sudo vim /etc/grafana/grafana.ini
+
+🔍 Find and update the [smtp] section like this:
+; Note: DO NOT use your normal Gmail password
+✅ Don't forget to remove the ; from each line to enable the setting.
+
+[smtp]
+enabled = true
+host = smtp.gmail.com:587
+user = nandeeshgm20@gmail.com
+password = <your-app-password>
+skip_verify = true
+from_address = nandeeshgm20@gmail.com
+from_name = Grafana Alerts
+📌 IMPORTANT: Use Gmail App Password, not your main password. Generate one here (if 2FA is enabled):
+👉 https://myaccount.google.com/apppasswords
+
+✅ 3. 🔄 Restart Grafana
+sudo systemctl restart grafana-server
+
+✅ 4. 📤 Test Alert Email
+Now go back to your Grafana UI → Alerting → Contact points, select the email (as shown in your screenshot), and click “Test”. You should receive a test email to nandeeshgm20@gmail.com.
+
+✅ 5. Create an Alert Rule
+Now that email works:
+Go to Alerting → Alert Rules
+Create a rule for a metric (e.g. when node_exporter's CPU usage > 80%)
+Link the alert rule to the Nandeesh email contact point
+
+Example condition:
+100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[1m])) * 100) > 80
+
+
+
+
