@@ -73,7 +73,99 @@ terraform init	: initalize the provider plugins on backend
 terraform plan	: to create execution plan
 terrafrom apply : to create resources
 terrafrom destroy : to delete resources
+----------------------------------------------------------------------
 
+✅ — Trivy and Terrascan are perfect DevSecOps add-ons** for Terraform + AWS** because:
+Terrascan → scans your .tf files for misconfigurations before deploying (IaC security).
+Trivy → scans deployed AWS resources, container images, files, and IaC for vulnerabilities.
+Here’s how you can integrate them step-by-step for your case:
+
+1️⃣ Install Terrascan:
+
+#Remove old files
+rm -f terrascan terrascan.tar.gz
+
+# Download the latest Linux binary
+curl -L "$(curl -s https://api.github.com/repos/tenable/terrascan/releases/latest | grep -o -E 'https://.+?_Linux_x86_64.tar.gz')" -o terrascan.tar.gz
+
+# Extract the binary and remove the archive
+tar -xf terrascan.tar.gz terrascan && rm -f terrascan.tar.gz
+
+# Install the binary
+sudo install terrascan /usr/local/bin/ && rm -f terrascan
+
+# Verify
+terrascan version
+version: v1.19.9
+
+Usage:
+cd /path/to/terraform/code
+terrascan scan -t aws -f main.tf
+
+terrascan scan -t aws -i terraform
+terrascan scan -d .
+
+
+2️⃣ Install Trivy
+
+sudo apt install wget -y
+wget https://github.com/aquasecurity/trivy/releases/latest/download/trivy_Linux-64bit.tar.gz
+tar -xvzf trivy_Linux-64bit.tar.gz
+sudo mv trivy /usr/local/bin/
+
+# Verify
+trivy --version
+
+
+Trivy for IaC scanning (Terraform):
+
+cd /path/to/terraform/code
+trivy config .
+
+Trivy for AWS resource scan (after deploy):
+
+# AWS credentials must be configured (aws configure)
+trivy aws --region us-east-1
+
+3️⃣ CI/CD DevSecOps Integration
+If you’re using GitHub Actions, GitLab CI, or Jenkins, add a stage:
+
+# GitHub Actions Example
+name: Terraform Security Scan
+on: [push]
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install Terrascan
+        run: |
+          curl -L https://github.com/tenable/terrascan/releases/latest/download/terrascan_Linux_x86_64.tar.gz -o terrascan.tar.gz
+          tar -xvzf terrascan.tar.gz terrascan
+          sudo mv terrascan /usr/local/bin/
+      - name: Terrascan Check
+        run: terrascan scan -t aws -f main.tf
+      - name: Install Trivy
+        run: |
+          wget https://github.com/aquasecurity/trivy/releases/latest/download/trivy_Linux-64bit.tar.gz
+          tar -xvzf trivy_Linux-64bit.tar.gz
+          sudo mv trivy /usr/local/bin/
+      - name: Trivy IaC Check
+        run: trivy config .
+
+
+4️⃣ Workflow
+1.Write your Terraform code.
+2.Run:
+       terrascan scan -t aws -f main.tf
+        trivy config .
+3.Fix any issues flagged.
+4.Run terraform apply.
+5.After deploy:
+       trivy aws --region us-east-1
+
+----------------------------------------------------------------------
 provider "aws" {
 region = "ap-south-1"
 }
