@@ -124,6 +124,133 @@ trivy config .
 
 Trivy for AWS resource scan (after deploy):
 
+DevSecOps-ready main.tf:
+
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 6.8"
+    }
+  }
+
+  backend "s3" {
+    bucket         = "my-terraform-state-bucket" # create this bucket in AWS
+    key            = "ec2/terraform.tfstate"
+    region         = "us-east-1"
+    dynamodb_table = "terraform-locks" # create DynamoDB table with "LockID" as primary key
+    encrypt        = true
+  }
+}
+
+provider "aws" {
+  region = "us-east-1"
+}
+
+# IAM Role for EC2 (Least Privilege)
+resource "aws_iam_role" "ec2_role" {
+  name = "ec2-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Action = "sts:AssumeRole"
+        Effect = "Allow"
+        Principal = {
+          Service = "ec2.amazonaws.com"
+        }
+      }
+    ]
+  })
+}
+
+# Key Pair for SSH
+resource "aws_key_pair" "default" {
+  key_name   = "my-key"
+  public_key = file("~/.ssh/my-key.pub") # replace with your public key path
+}
+
+# Security Group (Restrict Access)
+resource "aws_security_group" "instance_sg" {
+  name        = "instance-sg"
+  description = "Security group for EC2"
+  vpc_id      = "vpc-xxxxxxxx" # replace with your VPC ID
+
+  ingress {
+    description = "SSH from my IP"
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["YOUR.PUBLIC.IP/32"] # replace with your public IP
+  }
+
+  ingress {
+    description = "HTTP"
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
+
+# EC2 Instance
+resource "aws_instance" "one" {
+  count         = var.instance_count
+  ami           = "ami-0e1989e836322f58b"
+  instance_type = var.instance_type
+  key_name      = aws_key_pair.default.key_name
+  security_groups = [aws_security_group.instance_sg.name]
+  iam_instance_profile = aws_iam_instance_profile.ec2_profile.name
+
+  user_data = <<-EOF
+    #!/bin/bash
+    apt-get update -y && apt-get upgrade -y
+  EOF
+
+  tags = {
+    Name        = "devsecops-instance-${count.index}"
+    Environment = "dev"
+    Owner       = "your-name"
+    ManagedBy   = "Terraform"
+  }
+}
+
+# IAM Instance Profile
+resource "aws_iam_instance_profile" "ec2_profile" {
+  name = "ec2-instance-profile"
+  role = aws_iam_role.ec2_role.name
+}
+
+# Variables
+variable "instance_count" {
+  description = "Number of EC2 instances to create"
+  type        = number
+  default     = 3
+}
+
+variable "instance_type" {
+  description = "EC2 instance type"
+  type        = string
+  default     = "t2.micro"
+}
+
+
+
+
+
+
+
+
+
+
 # AWS credentials must be configured (aws configure)
 trivy aws --region us-east-1
 
