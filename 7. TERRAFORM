@@ -1043,3 +1043,89 @@ Name = "${each.key}"
 
 
 
+=============================================================================================================
+
+
+INFRASTRUCTURE (with Security Integration)
+Original: Resources used to run our application on cloud.
+DevSecOps Enhanced: Secure infrastructure provisioning using Terraform with embedded best practices. For example: AWS resources like EC2, S3, ELB, VPC are defined using Terraform plus integrated security enhancements (e.g., encrypted volumes, secure metadata settings).
+
+What’s Terraform (with Security Focus)
+Original: Tool used for infrastructure automation, open source, platform independent (since 2014).
+DevSecOps Enhanced:
+Terraform is your Infrastructure-as-Code (IaC) solution—but in DevSecOps, we apply security as code. You:
+
+Write HCL (HashiCorp Configuration Language)
+
+Use tools like Checkov, tfsec, or Trivy config to scan Terraform code for misconfigurations before apply
+
+Enforce compliance and policy checks as part of your CI/CD pipeline
+
+Workflow & Commands (DevSecOps Add-ons)
+Here’s how your core Terraform commands evolve with a DevSecOps mindset:
+
+| Stage              | Original Command       | DevSecOps Enhancement                                                                                               |
+| ------------------ | ---------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| Init               | `terraform init`       | Same, but follow with `terraform fmt` and `terraform validate` for code quality assurance                           |
+| Plan               | `terraform plan`       | **Add** `trivy config --severity HIGH,CRITICAL main.tf` or `checkov -d .` to automatically detect policy violations |
+| Apply              | `terraform apply`      | Run only after security scans pass                                                                                  |
+| Destroy            | `terraform destroy`    | Ensure `prevent_destroy` in lifecycle blocks protects critical infra                                                |
+| State Management   | `terraform state list` | Secure state with remote backends (e.g., S3 with encryption, versioning, MFA delete)                                |
+| Targeted Changes   | `-target=` flags       | Use only for controlled edits—and verify no drift or unintended exposure afterward                                  |
+| Variables & TFVars | `-var-file` usage      | Encrypt sensitive variables or manage secrets via SSM/Secrets Manager integration                                   |
+| Outputs            | Output public IP, DNS  | **Add** sensitive outputs carefully, or avoid exposing them in CI logs                                              |
+
+
+Variables, Locals & Workspaces (Secure Configurations)
+Variables: Define with strong types and avoid hardcoded sensitive info
+
+Locals: Reuse environment-aware values (e.g., local.env = terraform.workspace) to isolate dev/test/prod configs
+
+Workspaces: Isolate environments; incorporate environment-specific security policies (e.g., prod must have encryption, dev can be lenient)
+
+Remote Backend & Secure State
+Original: Remote backend uses AWS S3 to store state safely.
+DevSecOps Addition:
+Configure S3 backend with:
+Bucket encryption
+Versioning & MFA Delete
+Optional: State locking with DynamoDB
+
+Example block:
+
+terraform {
+  backend "s3" {
+    bucket         = "secure-tfstate-bucket"
+    key            = "prod/terraform.tfstate"
+    region         = "ap-south-1"
+    encrypt        = true
+    dynamodb_table = "tfstate-locks"
+  }
+}
+Lifecycle & Policy Controls
+Prevent_destroy: Essential for critical resources like databases or VPCs
+Ignore_changes: Avoid accidental drift, but monitor changes through audits
+Add depends_on to enforce creation order, reducing security misconfiguration risks
+Advanced Terraform Features (Safeguards)
+Dynamic blocks: Use for security group definitions, ensuring only necessary ports are open
+Aliases / Multi-region providers: Isolate test infra from production; enforce stricter policies in prod region
+Security Scanning Tools for Terraform (DevSecOps Pipeline)
+Checkov, tfsec, Trivy config: Scan .tf files, prevent risky configs from apply
+
+Example usage:
+
+trivy config --severity HIGH,CRITICAL .
+Integrate in CI (GitHub Actions, Jenkins):
+
+- name: Terraform Security Scan
+  run: checkov -d .
+Summary & Structure for DevSecOps Training Material
+Definition and purpose of Terraform in a DevSecOps context
+Secure Infra as Code — include security scans early
+Secure CI/CD integration — enforce policy checks and gating
+Secure state management — remote, encrypted, versioned, locked
+Environment isolation — secure dev/test/prod via workspaces/locals
+Advanced sanitization — use lifecycle, dynamic blocks, variables securely
+Tool integration — Checkov, tfsec, Trivy in pipelines
+
+
