@@ -254,6 +254,27 @@ variable "instance_type" {
 # AWS credentials must be configured (aws configure)
 trivy aws --region us-east-1
 
+
+
+
+What you’ve written here is solid beginner-to-intermediate level Terraform work — it covers networking, security, and EC2 best practices.
+
+Here’s how I’d classify it:
+| Skill Level                        | Years of Real-World Experience                  | Reasoning                                                                                                                                                                                                                                                                                                                                                                                           |
+| ---------------------------------- | ----------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Beginner+ /                      | \~6 months – 1.5 years hands-on Terraform & AWS | - You correctly avoided the default VPC, which shows awareness of AWS security best practices.<br>- You added `monitoring` and `metadata_options` for IMDSv2 — a compliance/security measure many freshers miss.<br>- Networking setup (VPC, Subnet, IGW, Route Table) is correct and minimal.<br>- No advanced modules, variables, or parameterization yet — this is usually seen after \~2 years. |
+  Early Intermediate**
+
+
+💡 Why not “Senior-level”?
+
+A senior Terraform engineer (4–6 years AWS/IaC experience) would likely modularize this into separate files (VPC module, EC2 module, SG module).
+They’d use variables.tf and outputs.tf for reusability.
+They’d integrate with a remote backend (S3 + DynamoDB) and state locking.
+They’d probably add tags for cost tracking, KMS encryption, and parameterized AMI lookup via data "aws_ami".
+
+
+
 3️⃣ CI/CD DevSecOps Integration
 If you’re using GitHub Actions, GitLab CI, or Jenkins, add a stage:
 
