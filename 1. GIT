@@ -69,8 +69,8 @@ to show commits in single line: git log -2 --oneline
 
 CONFIGURING USER AND EMAIL:
 
-git config user.name "raham"
-git config user.email "raham@gmail.com"
+git config --global user.name "raham"
+git config --global user.email "raham@gmail.com"
 
 
 NOTE: this user and email will be replicated to new commits only.
@@ -99,8 +99,6 @@ git checkout movies	: to switch blw the branches
 git checkout -b dth	: to create and switch dth at same time
 git branch -m old new	: to rename a branch
 git branch -D recharge	: to delete a branch
-
-git branch -r : it showing thr remote branches in ur local repo
 
 git stash          # saves changes temporarily and cleans working directory
 git stash pop      # bring your changes back if needed
@@ -131,8 +129,12 @@ git commit -m "dev-1" movies*
 
 git pull airtel master --rebase
 git push airtel master
+git branch -r : it showing the remote branches in ur local repo
+git branch -a : it showing the remote branches and local branches in ur local repo
+git push airtel :dev   :it will delete the branches local branches to remote branches .
 
 git pull --rebase   : brings the remote commits into your local branch without creating messy merge commits.
+
 
 Then you can push cleanly.
 
