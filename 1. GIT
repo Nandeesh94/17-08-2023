@@ -126,6 +126,15 @@ git add movies*
 git commit -m "dev-1" movies*
 
 
+🔹 Option 1: Merge remote changes into local (safe way — usually preferred)
+
+git pull airtel master --rebase
+git push airtel master
+
+git pull --rebase   : brings the remote commits into your local branch without creating messy merge commits.
+
+Then you can push cleanly.
+
 NOW PUSH THE CODE TO GITHUB:
 create a repo
 git remote add origin https://github.com/nayakdebasish091/paytm.git
