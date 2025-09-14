@@ -100,6 +100,7 @@ git checkout -b dth	: to create and switch dth at same time
 git branch -m old new	: to rename a branch
 git branch -D recharge	: to delete a branch
 
+git branch -r : it showing thr remote branches in ur local repo
 
 git stash          # saves changes temporarily and cleans working directory
 git stash pop      # bring your changes back if needed
