@@ -101,7 +101,7 @@ git branch -m old new	: to rename a branch
 git branch -D recharge	: to delete a branch
 
 git stash          # saves changes temporarily and cleans working directory
-git stash pop      # bring your changes back if needed
+git stash pop      # git stash apply stashid + git stash drop stash id both work done with this command (immidiate apply and deleted)
 
 
 NOTE: to recover the delete branch
