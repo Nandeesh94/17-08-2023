@@ -150,6 +150,30 @@ NOTE: use server time (utc)
 *	: month
 *	: day (0=sun 1=mon ----)
 
+
+Character	Meaning	                             Example
+  *	       Wildcard (any value).	       * * * * * runs every minute of every hour... (i.e., every minute).
+  -	       Range of values.	               10-15 * * * * runs on minutes 10, 11, 12, 13, 14, and 15 of every hour.
+  /	       Step values.	                   */5 * * * * runs every 5th minute (i.e., at 0, 5, 10, 15...).
+  L	       Last (day of month or week).	   * * L * * runs on the last day of the month.
+
+
+Examples of Cron Expressions
+Expression	      Meaning
+0 2 * * *	     Run every day at 2:00 AM.
+30 10 * * 1-5	 Run at 10:30 AM, Monday through Friday.
+0 0 1 * *	     Run on the first day of every month at midnight.
+
+Export to Sheets
+
+
+
+
+
+
+
+
+
 11:05 08-09-2023
 
 5 11 8 9 5
