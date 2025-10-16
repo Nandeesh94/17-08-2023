@@ -164,8 +164,12 @@ Expression	      Meaning
 30 10 * * 1-5	 Run at 10:30 AM, Monday through Friday.
 0 0 1 * *	     Run on the first day of every month at midnight.
 
-Export to Sheets
-
+Field	      Value	Meaning
+Minute	        0  	  Runs at the start of the hour.
+Hour	        0	  Runs at midnight (12:00 AM).
+Day of Month    *	  Every day of the month.
+Month	        *	  Every month.
+Day of Week	   1,5	  Monday (1) and Friday (5).
 
 
 
