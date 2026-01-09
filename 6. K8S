@@ -434,6 +434,10 @@ spec:
     - image: nginx
       name: cont1
 
+ubuntu@ip-172-31-23-87:~$ kubectl apply -f nandeesh-namespace.yml --dry-run=client
+pod/nandeesh-pod configured (dry run)
+
+
 kubectl create -f abc.yml
 kubectl get po/pod/pods
 kubectl get po/pod/pods -o wide
